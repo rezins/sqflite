@@ -65,7 +65,7 @@ String? findPackageLibPath(String path) {
 String? findWindowsDllPath() {
   if(_sqLiteDllPath != null){
     var _exeDirPath = File(Platform.resolvedExecutable).parent.path;
-    var _assetsPackageDir = normalize(join('data', 'flutter_assets', 'assets'));
+    var _assetsPackageDir = normalize(join('data', 'flutter_assets'));
     var _packageAssetsDirPath = normalize(join(_exeDirPath, _assetsPackageDir));
     var _libDllSourceFullPath = normalize(join(_packageAssetsDirPath, _sqLiteDllPath));
     return _libDllSourceFullPath;
