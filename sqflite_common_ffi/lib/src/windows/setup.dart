@@ -28,7 +28,7 @@ void windowsInit({String? sqLiteDllPath}) {
   // otherwise make sure to copy the dll along with the executable
   _sqLiteDllPath = sqLiteDllPath;
   var path = findWindowsDllPath();
-  if (path != null) {
+  if (path != null && _sqLiteDllPath == null) {
     open.overrideFor(OperatingSystem.windows, () {
       // devPrint('loading $path');
       try {
@@ -38,6 +38,8 @@ void windowsInit({String? sqLiteDllPath}) {
         rethrow;
       }
     });
+  }else if(path != null && _sqLiteDllPath != null){
+    open.overrideForAll(() => DynamicLibrary.open(_sqLiteDllPath!));
   }
 
   // Force an open in the main isolate
