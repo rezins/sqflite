@@ -12,6 +12,8 @@ String packageGetSqlite3DllPath(String packagePath) {
   return path;
 }
 
+String? _sqLiteDllPath;
+
 /// Windows specific sqflite3 initialization.
 ///
 /// In debug mode: A bundled sqlite3.dll from the sqflite_common_ffi package
@@ -21,9 +23,10 @@ String packageGetSqlite3DllPath(String packagePath) {
 ///
 /// This code is only provided for reference. See package [`sqlite3`](https://pub.dev/packages/sqlite3)
 /// for more information.
-void windowsInit() {
+void windowsInit({String? sqLiteDllPath}) {
   // Look for the bundle sqlite3.dll while in development
   // otherwise make sure to copy the dll along with the executable
+  _sqLiteDllPath = sqLiteDllPath;
   var path = findWindowsDllPath();
   if (path != null) {
     open.overrideFor(OperatingSystem.windows, () {
@@ -60,10 +63,18 @@ String? findPackageLibPath(String path) {
 
 /// Find windows dll path.
 String? findWindowsDllPath() {
-  var location = findPackageLibPath(Directory.current.path);
-  if (location != null) {
-    var path = packageGetSqlite3DllPath(normalize(join(location)));
-    return path;
+  if(_sqLiteDllPath != null){
+    var _exeDirPath = File(Platform.resolvedExecutable).parent.path;
+    var _assetsPackageDir = normalize(join('data', 'flutter_assets', 'assets'));
+    var _packageAssetsDirPath = normalize(join(_exeDirPath, _assetsPackageDir));
+    var _libDllSourceFullPath = normalize(join(_packageAssetsDirPath, _sqLiteDllPath));
+    return _libDllSourceFullPath;
+  }else{
+    var location = findPackageLibPath(Directory.current.path);
+    if (location != null) {
+      var path = packageGetSqlite3DllPath(normalize(join(location)));
+      return path;
+    }
   }
   return null;
 }

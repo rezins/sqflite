@@ -55,8 +55,8 @@ DatabaseFactory createDatabaseFactoryFfi(
 ///
 /// Currently this only performs windows specific operations. Implementation
 /// is provided for reference only.
-void sqfliteFfiInit() {
+void sqfliteFfiInit({String? sqLiteDllPath}) {
   if (Platform.isWindows) {
-    windowsInit();
+    windowsInit(sqLiteDllPath: sqLiteDllPath);
   }
 }
