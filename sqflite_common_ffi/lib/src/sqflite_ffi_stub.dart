@@ -26,5 +26,5 @@ DatabaseFactory createDatabaseFactoryFfi(
 /// Optional. Initialize ffi loader.
 ///
 /// Call in main until you find a loader for your needs.
-void sqfliteFfiInit() => throw UnimplementedError(
+void sqfliteFfiInit({String? sqLiteDllPath}) => throw UnimplementedError(
     'sqfliteFfiInit only supported for io application');
