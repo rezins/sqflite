@@ -27,10 +27,10 @@ void windowsInit({String? sqLiteDllPath}) {
   // Look for the bundle sqlite3.dll while in development
   // otherwise make sure to copy the dll along with the executable
   _sqLiteDllPath = sqLiteDllPath;
+  var path = findWindowsDllPath();
   if(_sqLiteDllPath != null){
-    open.overrideForAll(() => DynamicLibrary.open(sqLiteDllPath!));
+    open.overrideForAll(() => DynamicLibrary.open(path!));
   }else{
-    var path = findWindowsDllPath();
     if (path != null) {
       open.overrideFor(OperatingSystem.windows, () {
         // devPrint('loading $path');
