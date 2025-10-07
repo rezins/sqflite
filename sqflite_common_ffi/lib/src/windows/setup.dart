@@ -15,6 +15,8 @@ String packageGetSqlite3DllPath(String packagePath) {
   return path;
 }
 
+String? _sqLiteDllPath;
+
 /// Windows specific sqflite3 initialization.
 ///
 /// In debug mode: A bundled sqlite3.dll from the sqflite_common_ffi package
@@ -24,21 +26,26 @@ String packageGetSqlite3DllPath(String packagePath) {
 ///
 /// This code is only provided for reference. See package [`sqlite3`](https://pub.dev/packages/sqlite3)
 /// for more information.
-void windowsInit() {
+void windowsInit({String? sqLiteDllPath}) {
   // Look for the bundle sqlite3.dll while in development
   // otherwise make sure to copy the dll along with the executable
+  _sqLiteDllPath = sqLiteDllPath;
   var path = findWindowsDllPath();
-  if (path != null) {
-    open.overrideFor(OperatingSystem.windows, () {
-      // devPrint('loading $path');
-      try {
-        return DynamicLibrary.open(path);
-      } catch (e) {
-        stderr.writeln('Failed to load sqlite3.dll at $path');
-        rethrow;
-      }
-    });
+  if (path != null){
+    if(_sqLiteDllPath != null){
+      open.overrideForAll(() => DynamicLibrary.open(path));
+    }else{
+      open.overrideFor(OperatingSystem.windows, () {
+        try {
+          return DynamicLibrary.open(path);
+        } catch (e) {
+          stderr.writeln('Failed to load sqlite3.dll at $path');
+          rethrow;
+        }
+      });
+    }
   }
+  
 
   // Force an open in the main isolate
   // Loading from an isolate seems to break on windows
@@ -127,6 +134,15 @@ String? findWindowsDllPath() => findWindowsSqlite3DllPath();
 
 /// Find windows dll path.
 String? findWindowsSqlite3DllPath() {
+
+  if(_sqLiteDllPath != null){
+    var _exeDirPath = File(Platform.resolvedExecutable).parent.path;
+    var _assetsPackageDir = normalize(join('data', 'flutter_assets'));
+    var _packageAssetsDirPath = normalize(join(_exeDirPath, _assetsPackageDir));
+    var _libDllSourceFullPath = normalize(join(_packageAssetsDirPath, _sqLiteDllPath));
+    return _libDllSourceFullPath;
+  }
+
   /// Try to look from the current path
   /// Handles and dart script ran withing a project importing sqflite_common_ffi
   var dllPath = findWindowsSqlite3DllPathFromPath(Directory.current.path);
